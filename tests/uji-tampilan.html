@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Uji Tampilan · SeBangun</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; color: #0f172a; }
+    iframe { width: 1100px; height: 800px; border: 1px solid #ccc; }
+    .PASS { color: #15803d; font-weight: 700; } .FAIL { color: #b91c1c; font-weight: 700; }
+    li { margin: 4px 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1>Uji tampilan (smoke test)</h1>
+  <p>Jalankan lewat server lokal, misalnya <code>python -m http.server</code>, lalu buka <code>/tests/uji-tampilan.html</code>.
+     Uji ini membuka semua halaman dan langkah, menekan semua tombol, menjawab soal, lalu mencatat galat JavaScript.</p>
+  <div id="ringkas">Menjalankan…</div>
+  <ul id="hasil"></ul>
+  <iframe id="app" src="../index.html#/beranda" title="Aplikasi yang diuji"></iframe>
+  <script>
+  (async function () {
+    'use strict';
+    const ring = document.getElementById('ringkas');
+    try { await jalankan(); } catch (e) { ring.textContent = 'GALAT UJI: ' + (e && e.stack || e); ring.className = 'FAIL'; }
+  })();
+
+  async function jalankan() {
+    const tunggu = (ms) => new Promise((r) => setTimeout(r, ms));
+    const ring = document.getElementById('ringkas');
+    const f = document.getElementById('app');
+    for (let i = 0; i < 200 && !(f.contentWindow && f.contentWindow.App); i++) await tunggu(50);
+    if (!f.contentWindow.App) throw new Error('Aplikasi tidak termuat di iframe');
+    const w = f.contentWindow, d = w.document;
+    w.confirm = () => true;
+    w.print = () => {};
+    try { w.localStorage.clear(); } catch (e) { /* abaikan */ }
+    const catatan = [];
+    const catat = (status, teks) => catatan.push({ status, teks });
+
+    async function klikSemua(putaran) {
+      for (let p = 0; p < putaran; p++) {
+        const tombol = Array.from(d.querySelectorAll('#isi button')).filter((b) => !b.closest('.kaki-langkah') && !b.closest('.titik-langkah') && !/Keluar|Pilih level|Hapus semua data/.test(b.textContent)); // tombol hapus data memuat ulang halaman
+        for (const b of tombol) {
+          if (b.isConnected && !b.disabled) { b.click(); await tunggu(1); }
+        }
+        for (const s of Array.from(d.querySelectorAll('#isi [data-sisi]')).slice(0, 8)) {
+          if (s.isConnected) { s.dispatchEvent(new w.MouseEvent('click', { bubbles: true })); await tunggu(5); }
+        }
+        for (const r of d.querySelectorAll('#isi input[type=range]')) {
+          r.value = r.max; r.dispatchEvent(new w.Event('input', { bubbles: true }));
+          r.value = r.min; r.dispatchEvent(new w.Event('input', { bubbles: true }));
+        }
+        for (const c of d.querySelectorAll('#isi input[type=checkbox]')) { c.click(); await tunggu(5); }
+        for (const i of d.querySelectorAll('#isi input.isian')) {
+          if (!i.disabled) { i.value = '1'; i.dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Enter', bubbles: true })); }
+        }
+        await tunggu(60);
+      }
+    }
+
+    const RUTE = ['beranda', 'prasyarat', 'konsep', 'seletak', 'segitiga', 'contoh', 'latihan', 'sketsa', 'ringkasan', 'tentang'];
+    for (const r of RUTE) {
+      ring.textContent = 'Menjalankan: ' + r;
+      const awal = w.__galat.length;
+      w.location.hash = '#/' + r;
+      await tunggu(200);
+      if (!d.querySelector('#isi').children.length) catat('FAIL', `${r}: halaman kosong`);
+      const n = d.querySelectorAll('.titik-langkah .titik').length;
+      if (n) {
+        for (let i = 0; i < n; i++) {
+          d.querySelectorAll('.titik-langkah .titik')[i].click();
+          await tunggu(40);
+          await klikSemua(2);
+        }
+        // tombol Lanjut/Kembali/Selesai
+        d.querySelectorAll('.titik-langkah .titik')[0].click();
+        await tunggu(50);
+        for (let i = 0; i < n; i++) {
+          const kaki = d.querySelectorAll('.kaki-langkah .tombol');
+          kaki[kaki.length - 1].click();
+          await tunggu(60);
+        }
+        if (!d.querySelector('.selesai-modul')) catat('FAIL', `${r}: layar "modul selesai" tidak muncul`);
+      } else {
+        await klikSemua(3);
+      }
+      await tunggu(300); // tunggu animasi selesai
+      const galatBaru = w.__galat.slice(awal);
+      catat(galatBaru.length ? 'FAIL' : 'PASS', `${r}: ${galatBaru.length ? galatBaru.join(' | ') : 'tanpa galat'}`);
+    }
+
+    // Menjawab benar setiap jenis soal lewat PemainSoal
+    w.location.hash = '#/contoh';
+    await tunggu(200);
+    for (const tipe of w.BankSoal.GENERATOR) {
+      const soal = w.BankSoal.buat(tipe);
+      const pem = w.PemainSoal.coba(soal, { warna: false });
+      const wadah = d.getElementById('isi');
+      wadah.appendChild(pem.elemen);
+      if (soal.jenis === 'angka') {
+        pem.elemen.querySelector('input.isian').value = w.Logika.formatAngka(soal.jawaban);
+        pem.elemen.querySelector('.deret-tombol .tombol').click();
+      } else if (soal.jenis === 'rasio') {
+        const ins = pem.elemen.querySelectorAll('input.isian');
+        ins[0].value = String(soal.jawaban[0]); ins[1].value = String(soal.jawaban[1]);
+        pem.elemen.querySelector('.deret-tombol .tombol').click();
+      } else {
+        pem.elemen.querySelectorAll('.opsi')[soal.jawaban].click();
+      }
+      await tunggu(30);
+      const benar = !!pem.elemen.querySelector('.umpan.benar') && !!pem.elemen.querySelector('.cek');
+      catat(benar ? 'PASS' : 'FAIL', `jawab benar ${tipe}: ${benar ? 'diterima, kotak cek muncul' : 'TIDAK diterima'}`);
+      pem.elemen.remove();
+    }
+
+    // Layar kecil: tidak boleh ada gulir horizontal
+    f.style.width = '360px';
+    for (const r of RUTE) {
+      w.location.hash = '#/' + r;
+      await tunggu(150);
+      const lebar = d.documentElement.scrollWidth;
+      catat(lebar <= 361 ? 'PASS' : 'FAIL', `lebar 360px ${r}: scrollWidth ${lebar}`);
+    }
+
+    const ul = document.getElementById('hasil');
+    catatan.forEach((c) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="${c.status}">${c.status}</span> ${c.teks.replace(/</g, '&lt;')}`;
+      ul.appendChild(li);
+    });
+    const gagal = catatan.filter((c) => c.status === 'FAIL').length;
+    ring.textContent = `${catatan.length - gagal} PASS, ${gagal} FAIL dari ${catatan.length} uji`;
+    ring.className = gagal ? 'FAIL' : 'PASS';
+    document.body.dataset.selesai = '1';
+  }
+  </script>
+</body>
+</html>

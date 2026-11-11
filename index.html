@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SeBangun · Belajar Kesebangunan</title>
+  <meta name="description" content="Media belajar interaktif kesebangunan bangun datar dan segitiga untuk siswa SMP: langkah demi langkah, gambar berwarna, rotasi interaktif, contoh soal, dan latihan bertahap.">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="aset/ikon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="css/gaya.css">
+</head>
+<body>
+  <div class="kerangka">
+    <header class="bilah-atas">
+      <a class="logo" href="#/beranda" aria-label="SeBangun, ke beranda">
+        <img src="aset/ikon.svg" alt="" width="30" height="30"><span>SeBangun</span>
+      </a>
+      <button type="button" class="tombol sekunder kecil" id="tombol-menu" aria-controls="samping" aria-expanded="false">☰ Menu</button>
+    </header>
+
+    <nav class="samping" id="samping" aria-label="Menu utama">
+      <a class="logo" href="#/beranda" aria-label="SeBangun, ke beranda">
+        <img src="aset/ikon.svg" alt="" width="34" height="34"><span>SeBangun</span>
+      </a>
+      <p class="tagline">Belajar kesebangunan bangun datar &amp; segitiga</p>
+      <div id="kemajuan" class="kemajuan"></div>
+      <ul class="nav" id="nav"></ul>
+    </nav>
+    <div class="tirai" id="tirai" hidden></div>
+
+    <main id="isi" tabindex="-1">
+      <noscript><p>Aplikasi ini memerlukan JavaScript. Aktifkan JavaScript di peramban (browser) kamu.</p></noscript>
+    </main>
+  </div>
+
+  <script src="js/logika.js"></script>
+  <script src="js/gambar.js"></script>
+  <script src="js/gambar-khusus.js"></script>
+  <script src="js/soal.js"></script>
+  <script src="js/komponen.js"></script>
+  <script src="js/pemain-soal.js"></script>
+  <script src="js/halaman/beranda.js"></script>
+  <script src="js/halaman/prasyarat.js"></script>
+  <script src="js/halaman/konsep.js"></script>
+  <script src="js/halaman/seletak.js"></script>
+  <script src="js/halaman/segitiga.js"></script>
+  <script src="js/halaman/contoh.js"></script>
+  <script src="js/halaman/latihan.js"></script>
+  <script src="js/halaman/sketsa.js"></script>
+  <script src="js/halaman/ringkasan.js"></script>
+  <script src="js/halaman/tentang.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

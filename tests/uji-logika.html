@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Uji Logika · SeBangun</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; color: #0f172a; }
+    table { border-collapse: collapse; width: 100%; max-width: 980px; }
+    th, td { border-bottom: 1px solid #e2e8f0; padding: 6px 8px; text-align: left; font-size: 14px; vertical-align: top; }
+    .PASS { color: #15803d; font-weight: 700; }
+    .FAIL { color: #b91c1c; font-weight: 700; }
+    #ringkas { font-size: 18px; font-weight: 800; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <h1>Uji logika SeBangun</h1>
+  <p>Buka file ini di peramban. Semua baris harus <b>PASS</b>.</p>
+  <div id="ringkas"></div>
+  <table><thead><tr><th>ID</th><th>Uji</th><th>Status</th><th>Keterangan</th></tr></thead><tbody id="hasil"></tbody></table>
+
+  <script src="../js/logika.js"></script>
+  <script src="../js/gambar.js"></script>
+  <script src="../js/gambar-khusus.js"></script>
+  <script src="../js/soal.js"></script>
+  <script>
+  (function () {
+    'use strict';
+    const L = Logika, G = Gambar;
+    const baris = [];
+    let no = 0;
+    function uji(nama, fn) {
+      no++;
+      const id = 'TC' + String(no).padStart(2, '0');
+      let status = 'PASS', ket = '';
+      try {
+        const r = fn();
+        if (r !== true) { status = 'FAIL'; ket = typeof r === 'string' ? r : 'hasil: ' + JSON.stringify(r); }
+      } catch (e) {
+        status = 'FAIL'; ket = String(e && e.stack || e);
+      }
+      baris.push({ id, nama, status, ket });
+    }
+    const dekat = (a, b, tol) => Math.abs(a - b) <= (tol || 1e-6) * Math.max(1, Math.abs(b));
+    const sama = (a, b) => JSON.stringify(a) === JSON.stringify(b) || `dapat ${JSON.stringify(a)}, harusnya ${JSON.stringify(b)}`;
+    const ULANG = 300;
+
+    // ---------- logika.js ----------
+    uji('fpb(12, 18) = 6', () => sama(L.fpb(12, 18), 6));
+    uji('sederhanakan 5 : 10 = 1 : 2', () => sama(L.sederhanakan(5, 10), [1, 2]));
+    uji('sederhanakan 1,5 : 2 = 3 : 4 (desimal)', () => sama(L.sederhanakan(1.5, 2), [3, 4]));
+    uji('senilai 2:3 = 4:6, bukan 4:7', () => L.senilai(2, 3, 4, 6) && !L.senilai(2, 3, 4, 7));
+    uji('cariX: 2/3 = 12/x -> x = 18', () => sama(L.cariX(2, 3, 12), 18));
+    uji('parseAngka menerima koma, pecahan, satuan', () =>
+      L.parseAngka('7,5') === 7.5 && L.parseAngka('15/2') === 7.5 && L.parseAngka('9 cm') === 9 &&
+      L.parseAngka('x = 4') === 4 && L.parseAngka(' 12 ') === 12 && L.parseAngka('6.5') === 6.5 || 'gagal membaca salah satu format');
+    uji('parseAngka menolak teks/kosong', () => isNaN(L.parseAngka('abc')) && isNaN(L.parseAngka('')) && isNaN(L.parseAngka('3/0')) && isNaN(L.parseAngka('1,2,3')));
+    uji('formatAngka gaya Indonesia', () =>
+      sama([L.formatAngka(7.5), L.formatAngka(10), L.formatAngka(2 / 3), L.formatAngka(100), L.formatAngka(0), L.formatAngka(12.0001)], ['7,5', '10', '0,67', '100', '0', '12']));
+    uji('samaDengan toleran pembulatan', () => L.samaDengan(6.67, 20 / 3) && !L.samaDengan(7, 7.5) && !L.samaDengan(NaN, 1));
+    uji('segitigaDariSisi(3,4,5) panjang sisinya benar', () => {
+      const p = L.panjangSisi(L.segitigaDariSisi(3, 4, 5)); // [AB, BC, CA] = [5, 3, 4]
+      return (dekat(p[0], 5) && dekat(p[1], 3) && dekat(p[2], 4)) || JSON.stringify(p);
+    });
+    uji('segitigaDariSisi menolak segitiga tidak valid', () => L.segitigaDariSisi(1, 2, 5) === null);
+    uji('cekSebangun: hasil transformasi tetap sebangun', () => {
+      const t = L.segitigaDariSisi(5, 4, 6);
+      const t2 = G.transformasi(t, { skala: 2.5, putar: 73, cermin: true });
+      const t3 = t2.map((p, i) => (i === 2 ? [p[0] + 0.5, p[1]] : p));
+      return L.cekSebangun(t, t2).sebangun && !L.cekSebangun(t, t3).sebangun;
+    });
+    uji('cekSSS tidak bergantung urutan sisi', () => L.cekSSS([4, 5, 6], [9, 7.5, 6]).sebangun && !L.cekSSS([4, 5, 6], [8, 10, 13]).sebangun);
+    uji('cekPersegiPanjang: dikali sebangun, ditambah tidak', () =>
+      L.cekPersegiPanjang(4, 2, 6, 3).sebangun && !L.cekPersegiPanjang(6, 2, 4, 3).sebangun && !L.cekPersegiPanjang(3, 2, 5, 4).sebangun && L.cekPersegiPanjang(4, 2, 3, 6).sebangun);
+
+    // ---------- gambar.js ----------
+    uji('render menghasilkan SVG tanpa NaN', () => {
+      const t = L.segitigaDariSisi(5, 4, 6);
+      const s = G.render(G.bangun(t, { nama: ['A', 'B', 'C'], busur: [1, 2, 3], labelSisi: ['6', '5', '4'], warnaSisi: G.PASANGAN }));
+      return (s.indexOf('<svg') === 0 && s.indexOf('NaN') === -1) || 'SVG tidak valid';
+    });
+    uji('figur khusus (A, X, garis tinggi, bayangan) tanpa NaN', () => {
+      const sg = L.segitigaDariSisi(5, 4, 6);
+      const daftar = [
+        GambarKhusus.figBersarang({ A: [3, 6], B: [0, 0], C: [8, 0], t: 0.5, pisah: 0.5, sudut: true }),
+        GambarKhusus.figX({ A: [0, 0], B: [6, 0], E: [sg[2][0], -sg[2][1]], k: 1.5, pisah: 0.3, sudut: true }),
+        GambarKhusus.figTinggi({ p: 16, q: 9, mode: 'tiga' }),
+        GambarKhusus.figBayangan({ h1: 1.5, s1: 2, h2: 6, s2: 8 }),
+      ];
+      return daftar.every((r) => G.render(r.items, { batas: r.batas || undefined }).indexOf('NaN') === -1) || 'ada NaN';
+    });
+
+    // ---------- soal.js (setiap generator diuji berulang dengan angka acak) ----------
+    BankSoal.GENERATOR.forEach((tipe) => {
+      uji(`${tipe}: ${ULANG}× soal acak valid (jawaban, langkah, gambar)`, () => {
+        for (let i = 0; i < ULANG; i++) {
+          const s = BankSoal.buat(tipe);
+          if (!s.pertanyaan || !s.langkah || !s.langkah.length || !s.cek) return 'struktur soal tidak lengkap';
+          if (s.jenis === 'angka' && !(isFinite(s.jawaban) && s.jawaban > 0)) return 'jawaban tidak valid: ' + s.jawaban;
+          if (s.jenis === 'pilihan' && !(s.jawaban >= 0 && s.jawaban < s.pilihan.length)) return 'indeks pilihan salah';
+          if (s.gambar) {
+            for (const st of [{}, { warna: false }, { pisah: true }, { pisah: true, ab: true, bc: true }, { t: 0.5, pisah: true }]) {
+              const svg = s.gambar(st);
+              if (svg.indexOf('<svg') !== 0 || svg.indexOf('NaN') !== -1 || svg.indexOf('undefined') !== -1) return 'gambar rusak pada ' + JSON.stringify(st);
+            }
+          }
+          const teks = s.pertanyaan + s.cek + s.langkah.map((l) => l.isi + (l.kenapa || '')).join('');
+          if (teks.indexOf('NaN') !== -1 || teks.indexOf('undefined') !== -1) return 'teks berisi NaN/undefined';
+        }
+        return true;
+      });
+    });
+
+    uji('periksa(): jawaban benar (format koma) diterima, kesalahan umum ditolak dengan pesan', () => {
+      for (const tipe of ['persegiPanjang', 'segitigaDiputar', 'bersarang', 'bayangan', 'modelX', 'garisTinggi', 'cariXPerbandingan']) {
+        for (let i = 0; i < ULANG; i++) {
+          const s = BankSoal.buat(tipe);
+          const ditulis = L.parseAngka(L.formatAngka(s.jawaban));
+          if (!BankSoal.periksa(s, ditulis).benar) return `${tipe}: jawaban benar ${s.jawaban} ditolak`;
+          for (const k of s.kesalahanUmum || []) {
+            const h = BankSoal.periksa(s, k.nilai);
+            if (h.benar) return `${tipe}: kesalahan umum ${k.nilai} diterima (jawaban ${s.jawaban})`;
+            if (h.pesan !== k.pesan) return `${tipe}: pesan kesalahan umum tidak muncul`;
+          }
+        }
+      }
+      return true;
+    });
+    uji('periksa(): teks bukan angka ditolak dengan pesan', () => {
+      const h = BankSoal.periksa(BankSoal.buat('bersarang'), L.parseAngka('abc'));
+      return (!h.benar && /angka/.test(h.pesan)) || 'tidak ada pesan';
+    });
+    uji('persegiPanjang: PQRS benar-benar sebangun dengan ABCD', () => {
+      for (let i = 0; i < ULANG; i++) {
+        const d = BankSoal.buat('persegiPanjang').data;
+        if (!L.cekSebangun(d.A, d.B).sebangun) return 'tidak sebangun';
+        if (!dekat(L.jarak(d.B[0], d.B[1]), d.x)) return 'panjang PQ di gambar ≠ jawaban';
+      }
+      return true;
+    });
+    uji('segitigaDiputar: gambar sebangun dan sisi yang ditanya = jawaban', () => {
+      for (let i = 0; i < ULANG; i++) {
+        const s = BankSoal.buat('segitigaDiputar'), d = s.data;
+        if (!L.cekSebangun(d.A, d.B).sebangun) return 'tidak sebangun';
+        if (!dekat(L.panjangSisi(d.B)[d.u], s.jawaban)) return 'panjang di gambar ≠ jawaban';
+      }
+      return true;
+    });
+    uji('bersarang: DE/BC = AD/AB dan jawaban bulat', () => {
+      for (let i = 0; i < ULANG; i++) {
+        const d = BankSoal.buat('bersarang').data;
+        if (!dekat(d.DE / d.BC, d.AD / d.AB)) return 'perbandingan tidak sama';
+        if (!L.apakahBulat(d.BC)) return 'BC tidak bulat: ' + d.BC;
+      }
+      return true;
+    });
+    uji('bayangan: tinggi/tinggi = bayangan/bayangan', () => {
+      for (let i = 0; i < ULANG; i++) {
+        const d = BankSoal.buat('bayangan').data;
+        if (!dekat(d.h2 / d.h1, d.s2 / d.s1)) return 'tidak sebanding';
+      }
+      return true;
+    });
+    uji('modelX: CD/AB = CE/AE = DE/BE', () => {
+      for (let i = 0; i < ULANG; i++) {
+        const d = BankSoal.buat('modelX').data;
+        if (!(dekat(d.CD / d.AB, d.k) && dekat(d.CE / d.AE, d.k) && dekat(d.DE / d.BE, d.k))) return 'tidak sebanding';
+      }
+      return true;
+    });
+    uji('garisTinggi: AD² = BD·DC atau AB² = BD·BC, jawaban bulat', () => {
+      for (let i = 0; i < ULANG; i++) {
+        const d = BankSoal.buat('garisTinggi').data;
+        const ok = d.tanya === 'AD' ? dekat(d.x * d.x, d.p * d.q) : dekat(d.x * d.x, d.p * d.n);
+        if (!ok || !L.apakahBulat(d.x)) return 'rumus/angka salah';
+      }
+      return true;
+    });
+    uji('sederhanakanRasio: bentuk senilai tapi belum sederhana ditolak dengan pesan', () => {
+      const s = BankSoal.buat('sederhanakanRasio');
+      const [x, y] = s.jawaban;
+      const benar = BankSoal.periksa(s, [x, y]).benar;
+      const h = BankSoal.periksa(s, [2 * x, 2 * y]);
+      return (benar && !h.benar && /sederhana/.test(h.pesan)) || 'gagal';
+    });
+    uji('sebangunAtauTidak: kunci jawaban sesuai perhitungan', () => {
+      for (let i = 0; i < ULANG; i++) {
+        const s = BankSoal.buat('sebangunAtauTidak'), d = s.data;
+        let sebangun;
+        if (d.s1) sebangun = L.cekSSS(d.s1, d.s2).sebangun;
+        else if (d.p2 != null) sebangun = L.cekPersegiPanjang(d.p, d.l, d.p2, d.l2).sebangun;
+        else sebangun = false; // persegi vs belah ketupat
+        if ((s.jawaban === 0) !== sebangun) return 'kunci salah: ' + JSON.stringify(d);
+      }
+      return true;
+    });
+    uji('pilihSisiSeletak: sisi kunci memang pasangan sisi yang ditanya', () => {
+      for (let i = 0; i < ULANG; i++) {
+        const s = BankSoal.buat('pilihSisiSeletak'), d = s.data;
+        const nama = (j) => [d.huruf[j], d.huruf[(j + 1) % 3]].sort().join('');
+        if (nama(d.u) !== s.pilihan[s.jawaban]) return 'kunci salah';
+        const rasio = L.panjangSisi(d.klm).map((v, j) => v / L.panjangSisi(d.abc)[j]);
+        if (!rasio.every((r) => dekat(r, rasio[0]))) return 'segitiga tidak sebangun';
+      }
+      return true;
+    });
+
+    // ---------- tampilkan ----------
+    const tbody = document.getElementById('hasil');
+    baris.forEach((b) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${b.id}</td><td>${b.nama}</td><td class="${b.status}">${b.status}</td><td>${b.ket.replace(/</g, '&lt;')}</td>`;
+      tbody.appendChild(tr);
+    });
+    const lulus = baris.filter((b) => b.status === 'PASS').length;
+    const r = document.getElementById('ringkas');
+    r.textContent = `${lulus} PASS, ${baris.length - lulus} FAIL dari ${baris.length} uji`;
+    r.className = lulus === baris.length ? 'PASS' : 'FAIL';
+    document.body.dataset.hasil = r.textContent;
+  })();
+  </script>
+</body>
+</html>
