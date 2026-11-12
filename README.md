@@ -1,8 +1,9 @@
-# SeBangun: Media Belajar Interaktif Kesebangunan
+# KeBangun: Media Belajar Interaktif Kesebangunan
 
 Aplikasi web untuk membantu siswa SMP memahami **kesebangunan bangun datar dan segitiga**. Rancangannya disusun dari hasil wawancara dengan seorang siswa kelas 9 (kode S01) dan dianalisis dengan *Cognitive Load Theory* (beban intrinsik, ekstrinsik, dan germane).
 
-Demo: `https://rasyadfazrim-31.github.io/kesebangunan-interaktif/` (aktif setelah GitHub Pages dinyalakan, lihat bagian **Publikasi**).
+- Aplikasi (draf): https://rasyadfazrim-31.github.io/2225250023_Rasyad_Fazri_Mulyono/
+- Instrumen pre-test dan post-test: [instrumen/](instrumen/)
 
 ## Fitur
 
@@ -35,6 +36,18 @@ Demo: `https://rasyadfazrim-31.github.io/kesebangunan-interaktif/` (aktif setela
 | GL04 | Menjelaskan kepada teman. | Kotak "Jelaskan ke teman". |
 | DS01 | Butuh latihan bertahap. | Latihan 5 level. |
 
+## Instrumen pre-test dan post-test
+
+Untuk mengukur pengaruh aplikasi, disediakan instrumen **Mathematical Literacy** pada materi kesebangunan dengan format kisi-kisi dari dosen (4 indikator, skor maksimum 6 per indikator, total 24):
+
+| Berkas | Isi |
+|---|---|
+| [instrumen/README.md](instrumen/README.md) | Struktur konstruk, kesetaraan pre-test dan post-test, cara pelaksanaan |
+| [instrumen/pretest.md](instrumen/pretest.md) | Lembar soal, kisi-kisi jawaban per tahapan, pedoman penskoran pre-test |
+| [instrumen/posttest.md](instrumen/posttest.md) | Lembar soal, kisi-kisi jawaban per tahapan, pedoman penskoran post-test |
+
+Indikator: Mathematical Reasoning, Formulating Situations Mathematically, Employing Mathematical Concepts, Facts, and Procedures, serta Interpreting, Applying, and Evaluating Mathematical Outcomes.
+
 ## Cara menjalankan di komputer
 
 Tidak perlu instalasi apa pun.
@@ -42,31 +55,23 @@ Tidak perlu instalasi apa pun.
 - **Cara cepat:** klik dua kali `index.html` (terbuka di Chrome/Edge/Firefox).
 - **Lewat server lokal** (dibutuhkan untuk `tests/uji-tampilan.html`):
   ```
-  cd kesebangunan-interaktif
+  cd 2225250023_Rasyad_Fazri_Mulyono
   python -m http.server 8000
   ```
   lalu buka `http://localhost:8000`.
 
 ## Publikasi dengan GitHub Pages
 
-1. Buat repositori baru di GitHub bernama `kesebangunan-interaktif` (Public, tanpa README).
-2. Dari folder ini:
-   ```
-   git add .
-   git commit -m "feat: aplikasi belajar kesebangunan interaktif"
-   git remote add origin https://github.com/RasyadFazriM-31/kesebangunan-interaktif.git
-   git push -u origin main
-   ```
-3. Di GitHub: **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` / `(root)` → Save**.
-4. Tunggu 1–2 menit. Alamatnya: `https://rasyadfazrim-31.github.io/kesebangunan-interaktif/`.
+- Repositori: https://github.com/RasyadFazriM-31/2225250023_Rasyad_Fazri_Mulyono (format `NIM_Nama`)
+- Situs: https://rasyadfazrim-31.github.io/2225250023_Rasyad_Fazri_Mulyono/ (GitHub Pages, cabang `main`, folder root)
 
-Setiap kali ada perubahan, cukup `git add`, `git commit`, `git push`; situsnya ikut diperbarui.
+Setiap kali ada perubahan, cukup `git add`, `git commit`, `git push`; situsnya ikut diperbarui dalam 1–2 menit.
 
 ## Struktur folder
 
 ```
-kesebangunan-interaktif/
-|-- index.html              halaman utama
+2225250023_Rasyad_Fazri_Mulyono/
+|-- index.html              halaman utama aplikasi KeBangun
 |-- css/gaya.css            tampilan
 |-- aset/ikon.svg           ikon aplikasi
 |-- js/
@@ -78,6 +83,11 @@ kesebangunan-interaktif/
 |   |-- pemain-soal.js      mode "lihat langkah" dan "coba sendiri"
 |   |-- app.js              navigasi dan kemajuan belajar
 |   `-- halaman/            satu berkas per halaman/modul
+|-- instrumen/
+|   |-- README.md           struktur konstruk dan kesetaraan pre-test/post-test
+|   |-- pretest.md          soal + kisi-kisi + pedoman penskoran pre-test
+|   |-- posttest.md         soal + kisi-kisi + pedoman penskoran post-test
+|   `-- gambar/             gambar soal nomor 3
 `-- tests/
     |-- uji-logika.html     38 uji logika dan bank soal (300 soal acak per jenis)
     `-- uji-tampilan.html   uji asap: membuka semua halaman, menekan semua tombol, menjawab soal
