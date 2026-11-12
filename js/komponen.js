@@ -70,7 +70,7 @@
   const Simpan = {
     ambil(kunci, bawaan) {
       try {
-        const v = localStorage.getItem('sebangun:' + kunci);
+        const v = localStorage.getItem('kebangun:' + kunci);
         return v == null ? bawaan : JSON.parse(v);
       } catch (e) {
         return bawaan;
@@ -78,7 +78,7 @@
     },
     taruh(kunci, nilai) {
       try {
-        localStorage.setItem('sebangun:' + kunci, JSON.stringify(nilai));
+        localStorage.setItem('kebangun:' + kunci, JSON.stringify(nilai));
       } catch (e) {
         /* abaikan */
       }

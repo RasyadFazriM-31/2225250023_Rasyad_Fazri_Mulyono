@@ -24,7 +24,7 @@
     akar.append(
       el('header', { class: 'kepala-modul' },
         el('p', { class: 'label-kecil' }, 'Tentang'),
-        el('h1', null, 'Tentang SeBangun'),
+        el('h1', null, 'Tentang KeBangun'),
         el('p', { class: 'lead' }, 'Media belajar interaktif materi kesebangunan bangun datar dan segitiga untuk siswa SMP.')),
       el('section', { class: 'kartu' },
         el('h2', null, 'Dasar rancangan'),
@@ -39,7 +39,7 @@
         tombol('Hapus semua data di perangkat ini', () => {
           if (!window.confirm('Hapus kemajuan, skor, sketsa, dan tulisan di perangkat ini?')) return;
           try {
-            Object.keys(localStorage).filter((k) => k.indexOf('sebangun:') === 0).forEach((k) => localStorage.removeItem(k));
+            Object.keys(localStorage).filter((k) => k.indexOf('kebangun:') === 0).forEach((k) => localStorage.removeItem(k));
           } catch (e) { /* abaikan */ }
           location.hash = '#/beranda';
           location.reload();

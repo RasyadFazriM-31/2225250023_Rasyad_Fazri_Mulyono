@@ -137,7 +137,7 @@
       catatGalat(e);
       isi.append(el('div', { class: 'umpan salah' }, 'Maaf, halaman ini gagal dimuat. Coba muat ulang halaman.'));
     }
-    document.title = (m.id === 'beranda' ? '' : m.judul + ' · ') + 'SeBangun';
+    document.title = (m.id === 'beranda' ? '' : m.judul + ' · ') + 'KeBangun';
     bangunNav();
     tutupMenu();
     window.scrollTo(0, 0);
