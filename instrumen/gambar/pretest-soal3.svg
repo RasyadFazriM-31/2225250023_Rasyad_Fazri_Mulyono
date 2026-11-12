@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 280" width="460" height="280" font-family="Arial, Helvetica, sans-serif">
+  <!-- Rangka atap ΔABC: AB = AC = 3 m, BC = 4,5 m, AD = 2 m, DB = 1 m, DE ∥ BC (skala 80 px = 1 m) -->
+  <rect width="460" height="280" fill="#ffffff"/>
+  <g stroke="#7c4a1e" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M50 230 L230 71.3 L410 230 Z"/>
+  </g>
+  <line x1="110" y1="177.1" x2="350" y2="177.1" stroke="#b45309" stroke-width="6" stroke-linecap="round"/>
+  <!-- tanda sejajar -->
+  <path d="M224 171 L232 177.1 L224 183.2" fill="none" stroke="#0f172a" stroke-width="2"/>
+  <path d="M224 224 L232 230 L224 236" fill="none" stroke="#0f172a" stroke-width="2"/>
+  <g fill="#0f172a" font-size="18" font-weight="700" text-anchor="middle">
+    <text x="230" y="58">A</text>
+    <text x="36" y="246">B</text>
+    <text x="424" y="246">C</text>
+    <text x="94" y="174">D</text>
+    <text x="368" y="174">E</text>
+  </g>
+  <g fill="#0f172a" font-size="15" text-anchor="middle">
+    <text x="128" y="118">AD = 2 m</text>
+    <text x="70" y="203" text-anchor="end">DB = 1 m</text>
+    <text x="230" y="262">BC = 4,5 m</text>
+    <text x="230" y="166">DE = ?</text>
+  </g>
+</svg>

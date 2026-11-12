@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 300" width="460" height="300" font-family="Arial, Helvetica, sans-serif">
+  <!-- Penampang tenda ΔABC: AB = AC = 2 m, BC = 2,5 m, AD = 1,2 m, DB = 0,8 m, DE ∥ BC (skala 140 px = 1 m) -->
+  <rect width="460" height="300" fill="#ffffff"/>
+  <path d="M55 250 L230 31.5 L405 250 Z" fill="#dcfce7" stroke="#166534" stroke-width="6" stroke-linejoin="round"/>
+  <line x1="125" y1="162.5" x2="335" y2="162.5" stroke="#b45309" stroke-width="6" stroke-linecap="round"/>
+  <!-- lampu -->
+  <line x1="230" y1="162.5" x2="230" y2="178" stroke="#334155" stroke-width="2"/>
+  <circle cx="230" cy="185" r="7" fill="#fde68a" stroke="#b45309" stroke-width="2"/>
+  <!-- tanda sejajar -->
+  <path d="M262 156.5 L270 162.5 L262 168.5" fill="none" stroke="#0f172a" stroke-width="2"/>
+  <path d="M224 244 L232 250 L224 256" fill="none" stroke="#0f172a" stroke-width="2"/>
+  <g fill="#0f172a" font-size="18" font-weight="700" text-anchor="middle">
+    <text x="230" y="20">A</text>
+    <text x="40" y="266">B</text>
+    <text x="420" y="266">C</text>
+    <text x="108" y="160">D</text>
+    <text x="352" y="160">E</text>
+  </g>
+  <g fill="#0f172a" font-size="15" text-anchor="middle">
+    <text x="128" y="92">AD = 1,2 m</text>
+    <text x="78" y="212" text-anchor="end">DB = 0,8 m</text>
+    <text x="230" y="282">BC = 2,5 m</text>
+    <text x="192" y="150">DE = ?</text>
+  </g>
+</svg>
